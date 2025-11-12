@@ -5,312 +5,139 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Questionnaire DISC</title>
   <style>
-    body { margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial }
+    body{margin:0;font-family:system-ui,Segoe UI,Roboto,Arial}
+    .container{max-width:900px;margin:24px auto;padding:16px}
+    .card{background:#fff;border:1px solid #e5e7eb;border-radius:12px;box-shadow:0 4px 14px rgba(0,0,0,.06);padding:16px;margin-bottom:16px}
+    .btn{display:block;width:100%;padding:12px 16px;border:0;border-radius:10px;background:#4f46e5;color:#fff;font-weight:700;cursor:pointer}
+    .btn[disabled]{background:#cfd4dc;cursor:not-allowed}
+    .bar{height:8px;background:#e5e7eb;border-radius:9999px;overflow:hidden}
+    .bar>div{height:100%;background:#4f46e5}
+    .opt{display:flex;gap:8px;align-items:flex-start;padding:10px;border:2px solid #e5e7eb;border-radius:10px;margin:8px 0;background:#fff;cursor:pointer}
+    .opt.active{border-color:#4f46e5;background:#eef2ff}
   </style>
-  <!-- React 18 + ReactDOM 18 en CDN -->
+
+  <!-- React 18 -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   <!-- Recharts UMD -->
   <script src="https://unpkg.com/recharts/umd/Recharts.min.js"></script>
-  <!-- Babel pour compiler le JSX côté navigateur -->
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 </head>
 <body>
   <div id="root"></div>
 
-  <script type="text/babel">
+  <script>
+    // Sécurité: attrape les erreurs et affiche un message utile
+    window.addEventListener('error', e => {
+      document.body.insertAdjacentHTML('afterbegin',
+        '<pre style="white-space:pre-wrap;background:#fee2e2;padding:12px;border:1px solid #fecaca;border-radius:8px;color:#991b1b">Erreur: '+ (e.message||'') +'</pre>');
+    });
+
     const { useState } = React;
     const { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } = Recharts;
 
     const questions = [
-      { id: 1, options: [
-        { letter: 'a', text: 'Prudent et réfléchi', color: 'Bleu' },
-        { letter: 'b', text: 'Loyal et attentif à autrui', color: 'Vert' },
-        { letter: 'c', text: 'Influent et démonstratif', color: 'Jaune' },
-        { letter: 'd', text: 'Stratège et entreprenant', color: 'Rouge' }
-      ]},
-      { id: 2, options: [
-        { letter: 'a', text: 'Sociable et familier', color: 'Jaune' },
-        { letter: 'b', text: 'Honnête et discret', color: 'Vert' },
-        { letter: 'c', text: 'Énergique et orienté vers le résultat', color: 'Rouge' },
-        { letter: 'd', text: 'Méthodique et logique', color: 'Bleu' }
-      ]},
-      { id: 3, options: [
-        { letter: 'a', text: "Calme et d'humeur égale", color: 'Vert' },
-        { letter: 'b', text: 'Déterminé et aimant diriger', color: 'Rouge' },
-        { letter: 'c', text: 'Enjoué et rayonnant', color: 'Jaune' },
-        { letter: 'd', text: 'Formaliste et factuel', color: 'Bleu' }
-      ]},
-      { id: 4, options: [
-        { letter: 'a', text: 'Sûr de lui et volontaire', color: 'Rouge' },
-        { letter: 'b', text: 'Ordonné et concis', color: 'Bleu' },
-        { letter: 'c', text: 'Familier et stable', color: 'Vert' },
-        { letter: 'd', text: 'Loquace et de bonne humeur', color: 'Jaune' }
-      ]},
-      { id: 5, options: [
-        { letter: 'a', text: 'Perspicace et impartial', color: 'Bleu' },
-        { letter: 'b', text: 'Exigeant et direct', color: 'Rouge' },
-        { letter: 'c', text: 'Constant et attaché aux valeurs', color: 'Vert' },
-        { letter: 'd', text: 'Actif et liant', color: 'Jaune' }
-      ]},
-      { id: 6, options: [
-        { letter: 'a', text: 'Accommodant et serviable', color: 'Vert' },
-        { letter: 'b', text: "Plein d'espoir et expressif", color: 'Jaune' },
-        { letter: 'c', text: 'Puissant et sûr de lui', color: 'Rouge' },
-        { letter: 'd', text: 'Pensif et maître de soi', color: 'Bleu' }
-      ]},
-      { id: 7, options: [
-        { letter: 'a', text: 'Ouvert et persuasif', color: 'Jaune' },
-        { letter: 'b', text: 'Appliqué et sélectif dans ses relations', color: 'Vert' },
-        { letter: 'c', text: 'Ferme et entreprenant', color: 'Rouge' },
-        { letter: 'd', text: 'Posé et analytique', color: 'Bleu' }
-      ]},
-      { id: 8, options: [
-        { letter: 'a', text: 'Déterminé et résolu', color: 'Rouge' },
-        { letter: 'b', text: 'Avenant et jovial', color: 'Jaune' },
-        { letter: 'c', text: 'Sensible et amical', color: 'Vert' },
-        { letter: 'd', text: 'Logique et correct', color: 'Bleu' }
-      ]},
-      { id: 9, options: [
-        { letter: 'a', text: 'Compatissant et diplomate', color: 'Vert' },
-        { letter: 'b', text: 'Précis et mesuré', color: 'Bleu' },
-        { letter: 'c', text: 'Encourageant et ouvert aux idées', color: 'Jaune' },
-        { letter: 'd', text: 'Orienté résultat et rapidité', color: 'Rouge' }
-      ]},
-      { id: 10, options: [
-        { letter: 'a', text: 'Responsable et ferme', color: 'Rouge' },
-        { letter: 'b', text: 'Réservé et coopératif', color: 'Vert' },
-        { letter: 'c', text: 'Expansif et imaginatif', color: 'Jaune' },
-        { letter: 'd', text: 'Méticuleux et minutieux', color: 'Bleu' }
-      ]},
-      { id: 11, options: [
-        { letter: 'a', text: "Esprit d'équipe et spontané", color: 'Jaune' },
-        { letter: 'b', text: 'Contrôlé et rationnel', color: 'Bleu' },
-        { letter: 'c', text: 'Aimable et prévenant', color: 'Vert' },
-        { letter: 'd', text: 'Opiniâtre et visant le résultat', color: 'Rouge' }
-      ]},
-      { id: 12, options: [
-        { letter: 'a', text: 'Analyste et sceptique', color: 'Bleu' },
-        { letter: 'b', text: 'Amical et divertissant', color: 'Jaune' },
-        { letter: 'c', text: 'Exigeant et solide', color: 'Rouge' },
-        { letter: 'd', text: 'Modeste et fidèle', color: 'Vert' }
-      ]},
-      { id: 13, options: [
-        { letter: 'a', text: 'Attaché à ses proches et calme', color: 'Vert' },
-        { letter: 'b', text: 'Affectif et confiant', color: 'Jaune' },
-        { letter: 'c', text: 'Observateur et distant', color: 'Bleu' },
-        { letter: 'd', text: 'Actif et contrôlant', color: 'Rouge' }
-      ]},
-      { id: 14, options: [
-        { letter: 'a', text: 'Volontaire et tenace', color: 'Rouge' },
-        { letter: 'b', text: 'Conforme et sans parti pris', color: 'Bleu' },
-        { letter: 'c', text: 'Enthousiaste et attachant', color: 'Jaune' },
-        { letter: 'd', text: 'Impliqué et consensuel', color: 'Vert' }
-      ]},
-      { id: 15, options: [
-        { letter: 'a', text: 'Formel et à principe', color: 'Bleu' },
-        { letter: 'b', text: 'Jovial et populaire', color: 'Jaune' },
-        { letter: 'c', text: 'Modérateur et apaisant', color: 'Vert' },
-        { letter: 'd', text: 'Ferme et tranchant', color: 'Rouge' }
-      ]},
-      { id: 16, options: [
-        { letter: 'a', text: 'Animé et persuasif', color: 'Jaune' },
-        { letter: 'b', text: 'Décideur et pressé', color: 'Rouge' },
-        { letter: 'c', text: 'Analytique et aimant la discipline', color: 'Bleu' },
-        { letter: 'd', text: 'Tolérant et calme', color: 'Vert' }
-      ]},
-      { id: 17, options: [
-        { letter: 'a', text: 'Patient et empathique', color: 'Vert' },
-        { letter: 'b', text: 'Logique et mesuré', color: 'Bleu' },
-        { letter: 'c', text: 'Orienté résultat et prêt au défi', color: 'Rouge' },
-        { letter: 'd', text: 'Ouvert aux idées et arrangeant', color: 'Jaune' }
-      ]},
-      { id: 18, options: [
-        { letter: 'a', text: 'Influent et décontracté', color: 'Jaune' },
-        { letter: 'b', text: 'Discret et philosophe', color: 'Vert' },
-        { letter: 'c', text: 'Réfléchi et circonspect', color: 'Bleu' },
-        { letter: 'd', text: 'Opiniâtre et déterminé', color: 'Rouge' }
-      ]},
-      { id: 19, options: [
-        { letter: 'a', text: 'Axé procédure et bien préparé', color: 'Bleu' },
-        { letter: 'b', text: 'Courageux et autonome', color: 'Rouge' },
-        { letter: 'c', text: 'Extraverti et communicatif', color: 'Jaune' },
-        { letter: 'd', text: 'Bienveillant et de bon conseil', color: 'Vert' }
-      ]},
-      { id: 20, options: [
-        { letter: 'a', text: 'Puissant et clair', color: 'Rouge' },
-        { letter: 'b', text: 'Spontané et vif', color: 'Jaune' },
-        { letter: 'c', text: 'Studieux et raisonné', color: 'Bleu' },
-        { letter: 'd', text: "Paisible et aimant l'harmonie", color: 'Vert' }
-      ]},
-      { id: 21, options: [
-        { letter: 'a', text: 'Organisé et prudent', color: 'Bleu' },
-        { letter: 'b', text: 'Patient et serviable', color: 'Vert' },
-        { letter: 'c', text: 'Argumenté et sûr de lui', color: 'Rouge' },
-        { letter: 'd', text: 'Interactif et ouvert', color: 'Jaune' }
-      ]},
-      { id: 22, options: [
-        { letter: 'a', text: 'Indépendant et audacieux', color: 'Rouge' },
-        { letter: 'b', text: 'Souple et harmonieux', color: 'Vert' },
-        { letter: 'c', text: 'Factuel et respectueux des normes', color: 'Bleu' },
-        { letter: 'd', text: 'Aimable et vivant', color: 'Jaune' }
-      ]},
-      { id: 23, options: [
-        { letter: 'a', text: 'Démonstratif et enthousiaste', color: 'Jaune' },
-        { letter: 'b', text: 'Directif et réaliste', color: 'Rouge' },
-        { letter: 'c', text: 'Compatissant et prévenant', color: 'Vert' },
-        { letter: 'd', text: 'Attentif et soucieux du détail', color: 'Bleu' }
-      ]},
-      { id: 24, options: [
-        { letter: 'a', text: 'Stable et altruiste', color: 'Vert' },
-        { letter: 'b', text: 'Objectif et hardi', color: 'Rouge' },
-        { letter: 'c', text: 'Consciencieux et introspectif', color: 'Bleu' },
-        { letter: 'd', text: 'Sociable et bon vivant', color: 'Jaune' }
-      ]},
-      { id: 25, options: [
-        { letter: 'a', text: 'Détaillé et précautionneux', color: 'Bleu' },
-        { letter: 'b', text: 'Direct et carré', color: 'Rouge' },
-        { letter: 'c', text: 'Expressif et radieux', color: 'Jaune' },
-        { letter: 'd', text: 'Tolérant et ferme', color: 'Vert' }
-      ]}
+      { id:1, options:[{letter:'a',text:'Prudent et réfléchi',color:'Bleu'},{letter:'b',text:'Loyal et attentif à autrui',color:'Vert'},{letter:'c',text:'Influent et démonstratif',color:'Jaune'},{letter:'d',text:'Stratège et entreprenant',color:'Rouge'}]},
+      { id:2, options:[{letter:'a',text:'Sociable et familier',color:'Jaune'},{letter:'b',text:'Honnête et discret',color:'Vert'},{letter:'c',text:'Énergique et orienté vers le résultat',color:'Rouge'},{letter:'d',text:'Méthodique et logique',color:'Bleu'}]},
+      { id:3, options:[{letter:'a',text:"Calme et d'humeur égale",color:'Vert'},{letter:'b',text:'Déterminé et aimant diriger',color:'Rouge'},{letter:'c',text:'Enjoué et rayonnant',color:'Jaune'},{letter:'d',text:'Formaliste et factuel',color:'Bleu'}]},
+      { id:4, options:[{letter:'a',text:'Sûr de lui et volontaire',color:'Rouge'},{letter:'b',text:'Ordonné et concis',color:'Bleu'},{letter:'c',text:'Familier et stable',color:'Vert'},{letter:'d',text:'Loquace et de bonne humeur',color:'Jaune'}]},
+      { id:5, options:[{letter:'a',text:'Perspicace et impartial',color:'Bleu'},{letter:'b',text:'Exigeant et direct',color:'Rouge'},{letter:'c',text:'Constant et attaché aux valeurs',color:'Vert'},{letter:'d',text:'Actif et liant',color:'Jaune'}]},
+      { id:6, options:[{letter:'a',text:'Accommodant et serviable',color:'Vert'},{letter:'b',text:"Plein d'espoir et expressif",color:'Jaune'},{letter:'c',text:'Puissant et sûr de lui',color:'Rouge'},{letter:'d',text:'Pensif et maître de soi',color:'Bleu'}]},
+      { id:7, options:[{letter:'a',text:'Ouvert et persuasif',color:'Jaune'},{letter:'b',text:'Appliqué et sélectif dans ses relations',color:'Vert'},{letter:'c',text:'Ferme et entreprenant',color:'Rouge'},{letter:'d',text:'Posé et analytique',color:'Bleu'}]},
+      { id:8, options:[{letter:'a',text:'Déterminé et résolu',color:'Rouge'},{letter:'b',text:'Avenant et jovial',color:'Jaune'},{letter:'c',text:'Sensible et amical',color:'Vert'},{letter:'d',text:'Logique et correct',color:'Bleu'}]},
+      { id:9, options:[{letter:'a',text:'Compatissant et diplomate',color:'Vert'},{letter:'b',text:'Précis et mesuré',color:'Bleu'},{letter:'c',text:'Encourageant et ouvert aux idées',color:'Jaune'},{letter:'d',text:'Orienté résultat et rapidité',color:'Rouge'}]},
+      { id:10, options:[{letter:'a',text:'Responsable et ferme',color:'Rouge'},{letter:'b',text:'Réservé et coopératif',color:'Vert'},{letter:'c',text:'Expansif et imaginatif',color:'Jaune'},{letter:'d',text:'Méticuleux et minutieux',color:'Bleu'}]},
+      { id:11, options:[{letter:'a',text:"Esprit d'équipe et spontané",color:'Jaune'},{letter:'b',text:'Contrôlé et rationnel',color:'Bleu'},{letter:'c',text:'Aimable et prévenant',color:'Vert'},{letter:'d',text:'Opiniâtre et visant le résultat',color:'Rouge'}]},
+      { id:12, options:[{letter:'a',text:'Analyste et sceptique',color:'Bleu'},{letter:'b',text:'Amical et divertissant',color:'Jaune'},{letter:'c',text:'Exigeant et solide',color:'Rouge'},{letter:'d',text:'Modeste et fidèle',color:'Vert'}]},
+      { id:13, options:[{letter:'a',text:'Attaché à ses proches et calme',color:'Vert'},{letter:'b',text:'Affectif et confiant',color:'Jaune'},{letter:'c',text:'Observateur et distant',color:'Bleu'},{letter:'d',text:'Actif et contrôlant',color:'Rouge'}]},
+      { id:14, options:[{letter:'a',text:'Volontaire et tenace',color:'Rouge'},{letter:'b',text:'Conforme et sans parti pris',color:'Bleu'},{letter:'c',text:'Enthousiaste et attachant',color:'Jaune'},{letter:'d',text:'Impliqué et consensuel',color:'Vert'}]},
+      { id:15, options:[{letter:'a',text:'Formel et à principe',color:'Bleu'},{letter:'b',text:'Jovial et populaire',color:'Jaune'},{letter:'c',text:'Modérateur et apaisant',color:'Vert'},{letter:'d',text:'Ferme et tranchant',color:'Rouge'}]},
+      { id:16, options:[{letter:'a',text:'Animé et persuasif',color:'Jaune'},{letter:'b',text:'Décideur et pressé',color:'Rouge'},{letter:'c',text:'Analytique et aimant la discipline',color:'Bleu'},{letter:'d',text:'Tolérant et calme',color:'Vert'}]},
+      { id:17, options:[{letter:'a',text:'Patient et empathique',color:'Vert'},{letter:'b',text:'Logique et mesuré',color:'Bleu'},{letter:'c',text:'Orienté résultat et prêt au défi',color:'Rouge'},{letter:'d',text:'Ouvert aux idées et arrangeant',color:'Jaune'}]},
+      { id:18, options:[{letter:'a',text:'Influent et décontracté',color:'Jaune'},{letter:'b',text:'Discret et philosophe',color:'Vert'},{letter:'c',text:'Réfléchi et circonspect',color:'Bleu'},{letter:'d',text:'Opiniâtre et déterminé',color:'Rouge'}]},
+      { id:19, options:[{letter:'a',text:'Axé procédure et bien préparé',color:'Bleu'},{letter:'b',text:'Courageux et autonome',color:'Rouge'},{letter:'c',text:'Extraverti et communicatif',color:'Jaune'},{letter:'d',text:'Bienveillant et de bon conseil',color:'Vert'}]},
+      { id:20, options:[{letter:'a',text:'Puissant et clair',color:'Rouge'},{letter:'b',text:'Spontané et vif',color:'Jaune'},{letter:'c',text:'Studieux et raisonné',color:'Bleu'},{letter:'d',text:"Paisible et aimant l'harmonie",color:'Vert'}]},
+      { id:21, options:[{letter:'a',text:'Organisé et prudent',color:'Bleu'},{letter:'b',text:'Patient et serviable',color:'Vert'},{letter:'c',text:'Argumenté et sûr de lui',color:'Rouge'},{letter:'d',text:'Interactif et ouvert',color:'Jaune'}]},
+      { id:22, options:[{letter:'a',text:'Indépendant et audacieux',color:'Rouge'},{letter:'b',text:'Souple et harmonieux',color:'Vert'},{letter:'c',text:'Factuel et respectueux des normes',color:'Bleu'},{letter:'d',text:'Aimable et vivant',color:'Jaune'}]},
+      { id:23, options:[{letter:'a',text:'Démonstratif et enthousiaste',color:'Jaune'},{letter:'b',text:'Directif et réaliste',color:'Rouge'},{letter:'c',text:'Compatissant et prévenant',color:'Vert'},{letter:'d',text:'Attentif et soucieux du détail',color:'Bleu'}]},
+      { id:24, options:[{letter:'a',text:'Stable et altruiste',color:'Vert'},{letter:'b',text:'Objectif et hardi',color:'Rouge'},{letter:'c',text:'Consciencieux et introspectif',color:'Bleu'},{letter:'d',text:'Sociable et bon vivant',color:'Jaune'}]},
+      { id:25, options:[{letter:'a',text:'Détaillé et précautionneux',color:'Bleu'},{letter:'b',text:'Direct et carré',color:'Rouge'},{letter:'c',text:'Expressif et radieux',color:'Jaune'},{letter:'d',text:'Tolérant et ferme',color:'Vert'}]}
     ];
 
-    const profileDescriptions = {
-      Rouge: { title: "Dominance (D) - Rouge", description: "Profil orienté résultats, direct et décisif. Vous aimez les défis et prenez des initiatives." },
-      Jaune: { title: "Influence (I) - Jaune", description: "Profil sociable, expressif et enthousiaste. Vous aimez communiquer et convaincre les autres." },
-      Vert:  { title: "Stabilité (S) - Vert", description: "Profil calme, patient et loyal. Vous valorisez l'harmonie et la coopération." },
-      Bleu:  { title: "Conformité (C) - Bleu", description: "Profil analytique, précis et méthodique. Vous privilégiez la qualité et les procédures." }
+    const profiles = {
+      Rouge:{title:"Dominance (D) - Rouge",desc:"Profil orienté résultats, direct et décisif."},
+      Jaune:{title:"Influence (I) - Jaune",desc:"Profil sociable, expressif et enthousiaste."},
+      Vert:{ title:"Stabilité (S) - Vert", desc:"Profil calme, patient et loyal."},
+      Bleu:{ title:"Conformité (C) - Bleu", desc:"Profil analytique, précis et méthodique."}
     };
 
-    function DISCQuestionnaire() {
-      const [answers, setAnswers] = useState({});
-      const [showResults, setShowResults] = useState(false);
+    function App(){
+      const [answers,setAnswers]=React.useState({});
+      const [show,setShow]=React.useState(false);
 
-      const handleAnswer = (questionId, letter, color) => {
-        setAnswers(prev => ({ ...prev, [questionId]: { letter, color } }));
-      };
+      const onAnswer=(qid,opt)=>setAnswers(p=>({...p,[qid]:opt}));
+      const done=Object.keys(answers).length===questions.length;
 
-      const calculateScores = () => {
-        const scores = { Rouge: 0, Jaune: 0, Vert: 0, Bleu: 0 };
-        Object.values(answers).forEach(a => { scores[a.color]++; });
-        return scores;
-      };
-
-      const handleSubmit = () => {
-        if (Object.keys(answers).length === questions.length) setShowResults(true);
-        else alert(\`Veuillez répondre à toutes les questions. \${Object.keys(answers).length}/25 complétées.\`);
-      };
-
-      const resetTest = () => {
-        setAnswers({});
-        setShowResults(false);
-        window.scrollTo(0, 0);
-      };
-
-      const scores = calculateScores();
-      const chartData = [
-        { name: 'Dominance', score: scores.Rouge },
-        { name: 'Influence', score: scores.Jaune },
-        { name: 'Stabilité', score: scores.Vert },
-        { name: 'Conformité', score: scores.Bleu }
+      const scores=Object.values(answers).reduce((acc,a)=>(acc[a.color]++,acc),{Rouge:0,Jaune:0,Vert:0,Bleu:0});
+      const winner=Object.entries(scores).reduce((m,e)=>e[1]>m[1]?e:m)[0];
+      const chartData=[
+        {name:'Dominance',score:scores.Rouge},
+        {name:'Influence',score:scores.Jaune},
+        {name:'Stabilité',score:scores.Vert},
+        {name:'Conformité',score:scores.Bleu},
       ];
-      const dominantProfile = Object.entries(scores).reduce((a, b) => a[1] > b[1] ? a : b)[0];
 
-      if (showResults) {
-        return (
-          <div style={{minHeight:'100vh', background:'#eef2ff', padding:'24px'}}>
-            <div style={{maxWidth:900, margin:'0 auto', background:'#fff', borderRadius:16, boxShadow:'0 10px 30px rgba(0,0,0,.08)', padding:24}}>
-              <h1 style={{fontSize:28, marginBottom:16}}>Résultats DISC</h1>
-
-              <div style={{width:'100%', height:320}}>
-                <ResponsiveContainer>
-                  <BarChart data={chartData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis />
-                    <Tooltip />
-                    <Bar dataKey="score" />
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-
-              <div style={{marginTop:24, padding:16, background:'#f5f3ff', borderRadius:12}}>
-                <h3 style={{marginTop:0}}>
-                  Votre profil dominant : {profileDescriptions[dominantProfile].title}
-                </h3>
-                <p style={{marginBottom:0}}>
-                  {profileDescriptions[dominantProfile].description}
-                </p>
-              </div>
-
-              <button onClick={resetTest} style="width:100%;margin-top:16px;padding:12px 16px;border:0;border-radius:10px;background:#4f46e5;color:#fff;font-weight:600;cursor:pointer">
-                Recommencer le test
-              </button>
-            </div>
-          </div>
+      if(show){
+        return React.createElement('div',{className:'container'},
+          React.createElement('div',{className:'card'},
+            React.createElement('h1',null,'Résultats DISC'),
+            React.createElement('div',{style:{width:'100%',height:'320px'}},
+              React.createElement(ResponsiveContainer,null,
+                React.createElement(BarChart,{data:chartData},
+                  React.createElement(CartesianGrid,{strokeDasharray:"3 3"}),
+                  React.createElement(XAxis,{dataKey:"name"}),
+                  React.createElement(YAxis,null),
+                  React.createElement(Tooltip,null),
+                  React.createElement(Bar,{dataKey:"score"})
+                )
+              )
+            ),
+            React.createElement('div',{className:'card',style:{marginTop:16}},
+              React.createElement('h3',null,'Votre profil dominant : '+profiles[winner].title),
+              React.createElement('p',null,profiles[winner].desc)
+            ),
+            React.createElement('button',{className:'btn',onClick:()=>{setAnswers({});setShow(false);}},'Recommencer le test')
+          )
         );
       }
 
-      return (
-        <div style={{minHeight:'100vh', background:'#eef2ff', padding:'24px'}}>
-          <div style={{maxWidth:800, margin:'0 auto', background:'#fff', borderRadius:16, boxShadow:'0 10px 30px rgba(0,0,0,.08)', padding:24}}>
-            <h1 style={{fontSize:28, marginTop:0}}>Questionnaire DISC</h1>
-            <p style={{color:'#374151'}}>Pour chaque question, sélectionnez la ligne qui vous correspond le mieux.</p>
-
-            <p style={{fontSize:14, color:'#6b7280'}}>Progression : {Object.keys(answers).length}/25</p>
-            <div style={{width:'100%', height:6, background:'#e5e7eb', borderRadius:9999, overflow:'hidden', marginBottom:16}}>
-              <div style={{width: `${(Object.keys(answers).length/25)*100}%`, height:'100%', background:'#4f46e5'}}></div>
-            </div>
-
-            {questions.map((q) => (
-              <div key={q.id} style={{background:'#f9fafb', padding:16, borderRadius:12, border:'1px solid #e5e7eb', marginBottom:16}}>
-                <h3 style={{marginTop:0}}>Question {q.id}</h3>
-                <div>
-                  {q.options.map((opt) => {
-                    const checked = answers[q.id]?.letter === opt.letter;
-                    return (
-                      <label key={opt.letter} style={{
-                        display:'flex', alignItems:'flex-start', gap:8, padding:12,
-                        border:'2px solid ' + (checked ? '#4f46e5' : '#e5e7eb'),
-                        borderRadius:10, marginBottom:8, background: checked ? '#eef2ff' : '#fff', cursor:'pointer'
-                      }}>
-                        <input
-                          type="radio"
-                          name={`q-${q.id}`}
-                          value={opt.letter}
-                          checked={checked}
-                          onChange={() => handleAnswer(q.id, opt.letter, opt.color)}
-                          style={{marginTop:4}}
-                        />
-                        <div>
-                          <strong>{opt.letter}.</strong> {opt.text}
-                        </div>
-                      </label>
-                    );
-                  })}
-                </div>
-              </div>
-            ))}
-
-            <button
-              onClick={handleSubmit}
-              disabled={Object.keys(answers).length !== questions.length}
-              style={{
-                width:'100%', padding:'12px 16px', border:0, borderRadius:10,
-                background: Object.keys(answers).length === questions.length ? '#4f46e5' : '#d1d5db',
-                color:'#fff', fontWeight:700, cursor: Object.keys(answers).length === questions.length ? 'pointer' : 'not-allowed'
-              }}
-            >
-              {Object.keys(answers).length === questions.length
-                ? 'Voir mes résultats'
-                : `Complétez toutes les questions (${Object.keys(answers).length}/25)`}
-            </button>
-          </div>
-        </div>
+      return React.createElement('div',{className:'container'},
+        React.createElement('div',{className:'card'},
+          React.createElement('h1',null,'Questionnaire DISC'),
+          React.createElement('p',null,'Pour chaque question, sélectionnez la ligne qui vous correspond le mieux.'),
+          React.createElement('p',null,'Progression : '+Object.keys(answers).length+'/25'),
+          React.createElement('div',{className:'bar'},
+            React.createElement('div',{style:{width:(Object.keys(answers).length/25)*100+'%'}})
+          ),
+          questions.map(q =>
+            React.createElement('div',{key:q.id,className:'card'},
+              React.createElement('h3',null,'Question '+q.id),
+              q.options.map(opt=>{
+                const active=(answers[q.id]&&answers[q.id].letter===opt.letter);
+                return React.createElement('label',{key:opt.letter,className:'opt'+(active?' active':''),onClick:()=>onAnswer(q.id,opt)},
+                  React.createElement('input',{type:'radio',name:'q-'+q.id,checked:active,onChange:()=>{}}),
+                  React.createElement('div',null,React.createElement('strong',null,opt.letter+'. '),opt.text)
+                );
+              })
+            )
+          ),
+          React.createElement('button',{className:'btn',disabled:!done,onClick:()=>done&&setShow(true)},
+            done?'Voir mes résultats':'Complétez toutes les questions ('+Object.keys(answers).length+'/25)'
+          )
+        )
       );
     }
 
-    ReactDOM.createRoot(document.getElementById('root')).render(<DISCQuestionnaire />);
+    ReactDOM.createRoot(document.getElementById('root')).render(React.createElement(App));
   </script>
 </body>
 </html>
